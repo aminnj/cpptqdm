@@ -18,7 +18,7 @@ class tqdm {
         std::chrono::time_point<std::chrono::system_clock> t_old = std::chrono::system_clock::now();
         std::vector<double> deq;
         std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▋", "▋", "▊", "▉", "▉"};
-        bool in_gnuscreen = system("test $STY") == 0;
+        bool in_screen = (system("test $STY") == 0) || (system("test $TMUX") == 0);
         bool is_tty = isatty(1);
         bool color_transition = true;
         int width = 40;
@@ -49,7 +49,7 @@ class tqdm {
 
     public:
         tqdm() {
-            if (in_gnuscreen) {
+            if (in_screen) {
                 set_theme_basic();
                 color_transition = false;
             }
@@ -97,7 +97,7 @@ class tqdm {
                     printf("\015 \033[32m ");
                 }
                 for (int i = 0; i < ifills; i++) std::cout << bars[8];
-                if (!in_gnuscreen and (curr != tot)) printf("%s",bars[(int)(8.0*(fills-ifills))]);
+                if (!in_screen and (curr != tot)) printf("%s",bars[(int)(8.0*(fills-ifills))]);
                 for (int i = 0; i < width-ifills-1; i++) std::cout << bars[0];
                 printf("▏ \033[1m\033[31m%4.1f%% \033[34m ", pct);
                 printf("[%d | %.2f kHz | %.0fs<%.0fs] ", curr,  prate/1000.0, dt_tot, peta);
