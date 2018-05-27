@@ -37,7 +37,7 @@ class tqdm {
                 // and slowing down the loop (try to update ~100 times a second
                 // with a period that is a power of 10)
                 if (nupdates > 10) {
-                    period = (int)( std::min(std::max(0.1*pow(10,floor(log10(curr/dt_tot))),10.0), 1e5));
+                    period = (int)( std::min(std::max(0.2*pow(10,floor(log10(curr/dt_tot))),10.0), 1e5));
                 }
                 float peta = (tot-curr)/prate;
                 if (isatty(1)) {
