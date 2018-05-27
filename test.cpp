@@ -1,7 +1,7 @@
 #include "tqdm.h"
 
 int main() {
-    int N = 20000;
+    int N = 10000;
     tqdm bar;
     for(int i = 0; i < N; i++) {
         bar.progress(i, N);

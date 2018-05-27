@@ -16,11 +16,18 @@ class tqdm {
         std::chrono::time_point<std::chrono::system_clock> t_old = std::chrono::system_clock::now();
         std::vector<double> deq;
         std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▋", "▋", "▊", "▉", "▉"};
-        bool inscreen = system("test $STY") == 0;
+        bool in_gnuscreen = system("test $STY") == 0;
         int width = 40;
         int period = 1;
         int smoothing = 100;
         unsigned long nupdates = 0;
+
+        tqdm() {
+            if (in_gnuscreen) set_theme_basic();
+        }
+
+        void set_theme_arrow() { bars = {" ", "╴", "╾", "━", "━", "━", "━", "━", "─"}; }
+        void set_theme_basic() { bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; }
 
         void progress( int curr, int tot) {
             if(curr%period == 0) {
@@ -49,14 +56,14 @@ class tqdm {
                         peta = 0;
                     }
 
-                    printf("\015 \033[32m ▕");
+                    printf("\015 \033[32m ");
                     float fills = ((float)curr / tot * width);
                     int ifills = (int)fills;
                     for (int i = 0; i < ifills; i++) {
                         std::cout << bars[8];
                         // printf("%s",bars[8]);
                     }
-                    if (!inscreen) printf("%s",bars[(int)(8.0*(fills-ifills))]);
+                    if (!in_gnuscreen and (curr != tot)) printf("%s",bars[(int)(8.0*(fills-ifills))]);
                     for (int i = 0; i < width-ifills-1; i++) {
                         std::cout << bars[0];
                         // printf("%s",bars[0]);
