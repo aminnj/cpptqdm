@@ -42,7 +42,12 @@ class tqdm {
                 float peta = (tot-curr)/prate;
                 if (isatty(1)) {
                     float pct = (float)curr/(tot*0.01);
-                    if( ( tot - curr ) <= period ) pct = 100.0;
+                    if( ( tot - curr ) <= period ) {
+                        pct = 100.0;
+                        prate = tot/dt_tot;
+                        curr = tot;
+                        peta = 0;
+                    }
 
                     printf("\015 \033[32m ▕");
                     float fills = ((float)curr / tot * width);
