@@ -20,11 +20,14 @@ class tqdm {
         std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▋", "▋", "▊", "▉", "▉"};
         bool in_screen = (system("test $STY") == 0) || (system("test $TMUX") == 0);
         bool is_tty = isatty(1);
+        bool use_colors = true;
         bool color_transition = true;
         int width = 40;
         int period = 1;
         int smoothing = 100;
         unsigned long nupdates = 0;
+
+        std::string right_pad = "▏";
 
         void hsv_to_rgb(float h, float s, float v, int& r, int& g, int& b) {
             if (s < 1e-6) {
@@ -57,7 +60,14 @@ class tqdm {
 
         void set_theme_arrow() { bars = {" ", "╴", "╾", "━", "━", "━", "━", "━", "─"}; }
         void set_theme_circle() { bars = {" ", "◓", "◑", "◒", "◐", "◓", "◑", "◒", "#"}; }
-        void set_theme_basic() { bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; }
+        void set_theme_basic() {
+            bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; 
+            right_pad = "|";
+        }
+        void disable_colors() {
+            color_transition = false;
+            use_colors = false;
+        }
 
         void progress( int curr, int tot) {
             if (!is_tty) return;
@@ -73,7 +83,7 @@ class tqdm {
                 float prate = (float)period/avgdt;
                 // learn an appropriate period length to avoid spamming stdout
                 // and slowing down the loop 
-                if (nupdates > 10) {
+                if (nupdates > 10 && nupdates % 10 == 0) {
                     period = (int)( std::min(std::max(0.2*pow(10,floor(log10(curr/dt_tot))),10.0), 5e5));
                 }
                 float peta = (tot-curr)/prate;
@@ -88,20 +98,34 @@ class tqdm {
                 float fills = ((float)curr / tot * width);
                 int ifills = (int)fills;
 
-                if (color_transition) {
-                    // red (hue=0) to green (hue=1/3)
-                    int r = 255, g = 255, b = 255;
-                    hsv_to_rgb(0.0+0.01*pct/3,0.65,1.0, r,g,b);
-                    printf("\015 \033[38;2;%d;%d;%dm ", r, g, b);
-                } else {
-                    printf("\015 \033[32m ");
+                printf("\015 ");
+                if (use_colors) {
+                    if (color_transition) {
+                        // red (hue=0) to green (hue=1/3)
+                        int r = 255, g = 255, b = 255;
+                        hsv_to_rgb(0.0+0.01*pct/3,0.65,1.0, r,g,b);
+                        printf("\033[38;2;%d;%d;%dm ", r, g, b);
+                    } else {
+                        printf("\033[32m ");
+                    }
                 }
                 for (int i = 0; i < ifills; i++) std::cout << bars[8];
                 if (!in_screen and (curr != tot)) printf("%s",bars[(int)(8.0*(fills-ifills))]);
                 for (int i = 0; i < width-ifills-1; i++) std::cout << bars[0];
-                printf("▏ \033[1m\033[31m%4.1f%% \033[34m ", pct);
-                printf("[%d | %.2f kHz | %.0fs<%.0fs] ", curr,  prate/1000.0, dt_tot, peta);
-                printf("\033[0m\033[32m\033[0m\015 ");
+                printf("%s ", right_pad.c_str());
+                if (use_colors) printf("\033[1m\033[31m");
+                printf("%4.1f%% ", pct);
+                if (use_colors) printf("\033[34m");
+
+                std::string unit = "Hz";
+                float div = 1.;
+                if (prate > 1e6) {
+                    unit = "MHz"; div = 1.0e6;
+                } else if (prate > 1e3) {
+                    unit = "kHz"; div = 1.0e3;
+                }
+                printf("[%d/%d | %.1f %s | %.0fs<%.0fs] ", curr,tot,  prate/div, unit.c_str(), dt_tot, peta);
+                if (use_colors) printf("\033[0m\033[32m\033[0m\015 ");
 
                 if( ( tot - curr ) > period ) fflush(stdout);
                 else std::cout << std::endl;
