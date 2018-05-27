@@ -31,6 +31,7 @@ class tqdm {
         void set_theme_basic() { bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; }
 
         void progress( int curr, int tot) {
+            if (!isatty(1)) return;
             if(curr%period == 0) {
                 nupdates++;
                 auto now = std::chrono::system_clock::now();
@@ -48,33 +49,28 @@ class tqdm {
                     period = (int)( std::min(std::max(0.2*pow(10,floor(log10(curr/dt_tot))),10.0), 1e5));
                 }
                 float peta = (tot-curr)/prate;
-                if (isatty(1)) {
-                    float pct = (float)curr/(tot*0.01);
-                    if( ( tot - curr ) <= period ) {
-                        pct = 100.0;
-                        prate = tot/dt_tot;
-                        curr = tot;
-                        peta = 0;
-                    }
-
-                    printf("\015 \033[32m ");
-                    float fills = ((float)curr / tot * width);
-                    int ifills = (int)fills;
-                    for (int i = 0; i < ifills; i++) {
-                        std::cout << bars[8];
-                        // printf("%s",bars[8]);
-                    }
-                    if (!in_gnuscreen and (curr != tot)) printf("%s",bars[(int)(8.0*(fills-ifills))]);
-                    for (int i = 0; i < width-ifills-1; i++) {
-                        std::cout << bars[0];
-                        // printf("%s",bars[0]);
-                    }
-                    printf("▏ \033[1m\033[31m%4.1f%% \033[34m ", pct);
-                    printf("[%d | %.2f kHz | %.0fs<%.0fs] ", curr,  prate/1000.0, dt_tot, peta);
-                    printf("\033[0m\033[32m\033[0m\015 ");
-                    if( ( tot - curr ) > period ) fflush(stdout);
-                    else std::cout << std::endl;
+                float pct = (float)curr/(tot*0.01);
+                if( ( tot - curr ) <= period ) {
+                    pct = 100.0;
+                    prate = tot/dt_tot;
+                    curr = tot;
+                    peta = 0;
                 }
+
+                float fills = ((float)curr / tot * width);
+                int ifills = (int)fills;
+
+                printf("\015 \033[32m ");
+                for (int i = 0; i < ifills; i++) std::cout << bars[8];
+                if (!in_gnuscreen and (curr != tot)) printf("%s",bars[(int)(8.0*(fills-ifills))]);
+                for (int i = 0; i < width-ifills-1; i++) std::cout << bars[0];
+                printf("▏ \033[1m\033[31m%4.1f%% \033[34m ", pct);
+                printf("[%d | %.2f kHz | %.0fs<%.0fs] ", curr,  prate/1000.0, dt_tot, peta);
+                printf("\033[0m\033[32m\033[0m\015 ");
+
+                if( ( tot - curr ) > period ) fflush(stdout);
+                else std::cout << std::endl;
+
             }
         }
 };
