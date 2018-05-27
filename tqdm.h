@@ -18,14 +18,41 @@ class tqdm {
         std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▋", "▋", "▊", "▉", "▉"};
         bool in_gnuscreen = system("test $STY") == 0;
         bool is_tty = isatty(1);
+        bool color_transition = true;
         int width = 40;
         int period = 1;
         int smoothing = 100;
         unsigned long nupdates = 0;
 
         tqdm() {
-            if (in_gnuscreen) set_theme_basic();
+            if (in_gnuscreen) {
+                set_theme_basic();
+                color_transition = false;
+            }
         }
+
+        void hsv_to_rgb(float h, float s, float v, int& r, int& g, int& b) {
+            if (s < 1e-6) {
+                v *= 255.;
+                r = v; g = v; b = v;
+            }
+            int i = (int)(h*6.0);
+            float f = (h*6.)-i;
+            int p = (int)(255.0*(v*(1.-s)));
+            int q = (int)(255.0*(v*(1.-s*f)));
+            int t = (int)(255.0*(v*(1.-s*(1.-f))));
+            v *= 255;
+            i %= 6;
+            int vi = (int)v;
+            if (i == 0)      { r = vi; g = t;  b = p;  }
+            else if (i == 1) { r = q;  g = vi; b = p;  }
+            else if (i == 2) { r = p;  g = vi; b = t;  }
+            else if (i == 3) { r = p;  g = q;  b = vi; }
+            else if (i == 4) { r = t;  g = p;  b = vi; }
+            else if (i == 5) { r = vi; g = p;  b = q;  }
+        }
+
+
 
         void set_theme_arrow() { bars = {" ", "╴", "╾", "━", "━", "━", "━", "━", "─"}; }
         void set_theme_circle() { bars = {" ", "◓", "◑", "◒", "◐", "◓", "◑", "◒", "#"}; }
@@ -60,7 +87,14 @@ class tqdm {
                 float fills = ((float)curr / tot * width);
                 int ifills = (int)fills;
 
-                printf("\015 \033[32m ");
+                if (color_transition) {
+                    // red (hue=0) to green (hue=1/3)
+                    int r = 255, g = 255, b = 255;
+                    hsv_to_rgb(0.0+0.01*pct/3,0.65,1.0, r,g,b);
+                    printf("\015 \033[38;2;%d;%d;%dm ", r, g, b);
+                } else {
+                    printf("\015 \033[32m ");
+                }
                 for (int i = 0; i < ifills; i++) std::cout << bars[8];
                 if (!in_gnuscreen and (curr != tot)) printf("%s",bars[(int)(8.0*(fills-ifills))]);
                 for (int i = 0; i < width-ifills-1; i++) std::cout << bars[0];
