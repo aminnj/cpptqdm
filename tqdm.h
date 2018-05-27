@@ -17,6 +17,7 @@ class tqdm {
         std::vector<double> deq;
         std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▋", "▋", "▊", "▉", "▉"};
         bool in_gnuscreen = system("test $STY") == 0;
+        bool is_tty = isatty(1);
         int width = 40;
         int period = 1;
         int smoothing = 100;
@@ -31,7 +32,7 @@ class tqdm {
         void set_theme_basic() { bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; }
 
         void progress( int curr, int tot) {
-            if (!isatty(1)) return;
+            if (!is_tty) return;
             if(curr%period == 0) {
                 nupdates++;
                 auto now = std::chrono::system_clock::now();
@@ -43,10 +44,9 @@ class tqdm {
                 double avgdt = std::accumulate(deq.begin(),deq.end(),0.)/deq.size();
                 float prate = (float)period/avgdt;
                 // learn an appropriate period length to avoid spamming stdout
-                // and slowing down the loop (try to update ~100 times a second
-                // with a period that is a power of 10)
+                // and slowing down the loop 
                 if (nupdates > 10) {
-                    period = (int)( std::min(std::max(0.2*pow(10,floor(log10(curr/dt_tot))),10.0), 1e5));
+                    period = (int)( std::min(std::max(0.2*pow(10,floor(log10(curr/dt_tot))),10.0), 5e5));
                 }
                 float peta = (tot-curr)/prate;
                 float pct = (float)curr/(tot*0.01);

@@ -22,3 +22,33 @@ for(int i = 0; i < N; i++) {
 ```bash
 g++ test.cpp -std=c++11 && ./a.out
 ```
+
+### FAQ
+
+#### Won't this slow down my loops?
+
+If your loops are faster than ~200MHz, then maybe!
+
+#### Themes?
+
+You bet. `set_theme_basic(), set_theme_arrow(), set_theme_circles()`.
+
+#### *For fun*, what if I wanted to use this in python?
+
+If you have ROOT, you can do the following. Note that
+due to the fact it uses ROOT to call C++ code in
+Python, loops faster than 1kHz start to get slowed 
+down by the overhead.
+```python
+import time
+import ROOT as r
+
+r.gROOT.ProcessLine(".L tqdm.h")
+
+bar = r.tqdm()
+
+N = 10000
+for i in range(N):
+    bar.progress(i,N)
+    time.sleep(0.001)
+```
