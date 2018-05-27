@@ -1,3 +1,5 @@
+#ifndef TQDM_H
+#define TQDM_H
 #include <unistd.h>
 #include <chrono>
 #include <ctime>
@@ -108,3 +110,4 @@ class tqdm {
             }
         }
 };
+#endif
