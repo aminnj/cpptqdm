@@ -27,6 +27,7 @@ class tqdm {
         }
 
         void set_theme_arrow() { bars = {" ", "╴", "╾", "━", "━", "━", "━", "━", "─"}; }
+        void set_theme_circle() { bars = {" ", "◓", "◑", "◒", "◐", "◓", "◑", "◒", "#"}; }
         void set_theme_basic() { bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; }
 
         void progress( int curr, int tot) {
