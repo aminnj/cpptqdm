@@ -44,7 +44,7 @@ class tqdm {
                     float pct = (float)curr/(tot*0.01);
                     if( ( tot - curr ) <= period ) pct = 100.0;
 
-                    printf("\015 \033[32m ");
+                    printf("\015 \033[32m ▕");
                     float fills = ((float)curr / tot * width);
                     int ifills = (int)fills;
                     for (int i = 0; i < ifills; i++) {
@@ -56,7 +56,7 @@ class tqdm {
                         std::cout << bars[0];
                         // printf("%s",bars[0]);
                     }
-                    printf(" \033[1m\033[31m%4.1f%% \033[34m ", pct);
+                    printf("▏ \033[1m\033[31m%4.1f%% \033[34m ", pct);
                     printf("[%d | %.2f kHz | %.0fs<%.0fs] ", curr,  prate/1000.0, dt_tot, peta);
                     printf("\033[0m\033[32m\033[0m\015 ");
                     if( ( tot - curr ) > period ) fflush(stdout);
