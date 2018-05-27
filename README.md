@@ -25,8 +25,6 @@ g++ test.cpp -std=c++11 && ./a.out
 
 ![example](images/example.gif)
 
-[![examples](https://asciinema.org/a/DLNBDhfG5xp0PvryK1C9Q9SQl.png)](https://asciinema.org/a/DLNBDhfG5xp0PvryK1C9Q9SQl?autoplay=1)
-
 ### FAQ
 
 #### Won't this slow down my loops?
