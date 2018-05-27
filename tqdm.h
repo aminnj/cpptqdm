@@ -13,7 +13,7 @@
 #include <algorithm>
 
 class tqdm {
-    public:
+    private:
         std::chrono::time_point<std::chrono::system_clock> t_first = std::chrono::system_clock::now();
         std::chrono::time_point<std::chrono::system_clock> t_old = std::chrono::system_clock::now();
         std::vector<double> deq;
@@ -25,13 +25,6 @@ class tqdm {
         int period = 1;
         int smoothing = 100;
         unsigned long nupdates = 0;
-
-        tqdm() {
-            if (in_gnuscreen) {
-                set_theme_basic();
-                color_transition = false;
-            }
-        }
 
         void hsv_to_rgb(float h, float s, float v, int& r, int& g, int& b) {
             if (s < 1e-6) {
@@ -54,7 +47,13 @@ class tqdm {
             else if (i == 5) { r = vi; g = p;  b = q;  }
         }
 
-
+    public:
+        tqdm() {
+            if (in_gnuscreen) {
+                set_theme_basic();
+                color_transition = false;
+            }
+        }
 
         void set_theme_arrow() { bars = {" ", "╴", "╾", "━", "━", "━", "━", "━", "─"}; }
         void set_theme_circle() { bars = {" ", "◓", "◑", "◒", "◐", "◓", "◑", "◒", "#"}; }
