@@ -24,7 +24,7 @@ class tqdm {
         bool color_transition = true;
         int width = 40;
         int period = 1;
-        int smoothing = 100;
+        int smoothing = 50;
         unsigned long nupdates = 0;
 
         std::string right_pad = "▏";
@@ -58,8 +58,17 @@ class tqdm {
             }
         }
 
-        void set_theme_arrow() { bars = {" ", "╴", "╾", "━", "━", "━", "━", "━", "─"}; }
+        void reset() {
+            t_first = std::chrono::system_clock::now();
+            t_old = std::chrono::system_clock::now();
+            deq.clear();
+            period = 1;
+            nupdates = 0;
+        }
+
+        void set_theme_line() { bars = {"─", "─", "─", "╾", "╾", "╾", "╾", "━", "═"}; }
         void set_theme_circle() { bars = {" ", "◓", "◑", "◒", "◐", "◓", "◑", "◒", "#"}; }
+        void set_theme_braille() { bars = {" ", "⡀", "⡄", "⡆", "⡇", "⡏", "⡟", "⡿", "⣿" }; }
         void set_theme_basic() {
             bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; 
             right_pad = "|";
@@ -82,9 +91,10 @@ class tqdm {
                 double avgdt = std::accumulate(deq.begin(),deq.end(),0.)/deq.size();
                 float prate = (float)period/avgdt;
                 // learn an appropriate period length to avoid spamming stdout
-                // and slowing down the loop 
-                if (nupdates > 10 && nupdates % 10 == 0) {
-                    period = (int)( std::min(std::max(0.2*pow(10,floor(log10(curr/dt_tot))),10.0), 5e5));
+                // and slowing down the loop, shoot for ~30Hz and smooth over 2 seconds
+                if (nupdates > 10) {
+                    period = (int)( std::min(std::max(0.03*curr/dt_tot,1.0), 5e5));
+                    smoothing = (int)(std::min(2.0/dt,1000.0));
                 }
                 float peta = (tot-curr)/prate;
                 float pct = (float)curr/(tot*0.01);
@@ -124,7 +134,7 @@ class tqdm {
                 } else if (prate > 1e3) {
                     unit = "kHz"; div = 1.0e3;
                 }
-                printf("[%d/%d | %.1f %s | %.0fs<%.0fs] ", curr,tot,  prate/div, unit.c_str(), dt_tot, peta);
+                printf("[%4d/%4d | %.1f %s | %.0fs<%.0fs] ", curr,tot,  prate/div, unit.c_str(), dt_tot, peta);
                 if (use_colors) printf("\033[0m\033[32m\033[0m\015 ");
 
                 if( ( tot - curr ) > period ) fflush(stdout);

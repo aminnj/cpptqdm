@@ -33,7 +33,7 @@ If your loops are faster than ~200MHz, then maybe!
 
 #### Themes?
 
-You bet. `set_theme_basic(), set_theme_arrow(), set_theme_circles()`.
+You bet. `set_theme_basic(), set_theme_line(), set_theme_circles()`.
 
 #### *For fun*, what if I wanted to use this in python?
 
