@@ -28,6 +28,7 @@ class tqdm {
         unsigned long nupdates = 0;
 
         std::string right_pad = "▏";
+        std::string label = "";
 
         void hsv_to_rgb(float h, float s, float v, int& r, int& g, int& b) {
             if (s < 1e-6) {
@@ -64,6 +65,7 @@ class tqdm {
             deq.clear();
             period = 1;
             nupdates = 0;
+            label = "";
         }
 
         void set_theme_line() { bars = {"─", "─", "─", "╾", "╾", "╾", "╾", "━", "═"}; }
@@ -73,6 +75,7 @@ class tqdm {
             bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; 
             right_pad = "|";
         }
+        void set_label(std::string label_) { label = label_; }
         void disable_colors() {
             color_transition = false;
             use_colors = false;
@@ -89,22 +92,22 @@ class tqdm {
                 if (deq.size() >= smoothing) deq.erase(deq.begin());
                 deq.push_back(dt);
 
-                double avgdt = std::accumulate(deq.begin(),deq.end(),0.)/deq.size();
+                // double avgdt = std::accumulate(deq.begin(),deq.end(),0.)/deq.size();
 
-                // // EMA
-                // float alpha = 0.92;
-                // double accum = *(deq.begin());
-                // for(auto it = deq.begin()+1; it != deq.end(); it++){
-                //     accum = alpha*(*it) + (1.0-alpha)*accum;
-                // }
-                // double avgdt = accum;
+                // EMA
+                float alpha = 0.2;
+                double accum = *(deq.begin());
+                for(auto it = deq.begin()+1; it != deq.end(); it++){
+                    accum = alpha*(*it) + (1.0-alpha)*accum;
+                }
+                double avgdt = accum;
 
                 float prate = (float)period/avgdt;
                 // learn an appropriate period length to avoid spamming stdout
-                // and slowing down the loop, shoot for ~30Hz and smooth over 2 seconds
+                // and slowing down the loop, shoot for ~25Hz and smooth over 10 seconds
                 if (nupdates > 10) {
-                    period = (int)( std::min(std::max(0.03*curr/dt_tot,1.0), 5e5));
-                    smoothing = (int)(std::min(2.0/dt,1000.0));
+                    period = (int)( std::min(std::max((1.0/25)*curr/dt_tot,1.0), 5e5));
+                    smoothing = (int)(std::min(10.0/dt,1000.0));
                 }
                 float peta = (tot-curr)/prate;
                 float pct = (float)curr/(tot*0.01);
@@ -145,6 +148,7 @@ class tqdm {
                     unit = "kHz"; div = 1.0e3;
                 }
                 printf("[%4d/%4d | %.1f %s | %.0fs<%.0fs] ", curr,tot,  prate/div, unit.c_str(), dt_tot, peta);
+                printf("%s ", label.c_str());
                 if (use_colors) printf("\033[0m\033[32m\033[0m\015 ");
 
                 if( ( tot - curr ) > period ) fflush(stdout);
