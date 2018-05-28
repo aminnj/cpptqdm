@@ -88,7 +88,17 @@ class tqdm {
                 t_old = now;
                 if (deq.size() >= smoothing) deq.erase(deq.begin());
                 deq.push_back(dt);
+
                 double avgdt = std::accumulate(deq.begin(),deq.end(),0.)/deq.size();
+
+                // // EMA
+                // float alpha = 0.92;
+                // double accum = *(deq.begin());
+                // for(auto it = deq.begin()+1; it != deq.end(); it++){
+                //     accum = alpha*(*it) + (1.0-alpha)*accum;
+                // }
+                // double avgdt = accum;
+
                 float prate = (float)period/avgdt;
                 // learn an appropriate period length to avoid spamming stdout
                 // and slowing down the loop, shoot for ~30Hz and smooth over 2 seconds
