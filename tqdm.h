@@ -71,6 +71,7 @@ class tqdm {
         void set_theme_line() { bars = {"─", "─", "─", "╾", "╾", "╾", "╾", "━", "═"}; }
         void set_theme_circle() { bars = {" ", "◓", "◑", "◒", "◐", "◓", "◑", "◒", "#"}; }
         void set_theme_braille() { bars = {" ", "⡀", "⡄", "⡆", "⡇", "⡏", "⡟", "⡿", "⣿" }; }
+        void set_theme_braille_spin() { bars = {" ", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠇", "⠿" }; }
         void set_theme_basic() {
             bars = {" ", " ", " ", " ", " ", " ", " ", " ", "#"}; 
             right_pad = "|";
@@ -147,7 +148,7 @@ class tqdm {
                 } else if (prate > 1e3) {
                     unit = "kHz"; div = 1.0e3;
                 }
-                printf("[%4d/%4d | %.1f %s | %.0fs<%.0fs] ", curr,tot,  prate/div, unit.c_str(), dt_tot, peta);
+                printf("[%4d/%4d | %3.1f %s | %.0fs<%.0fs] ", curr,tot,  prate/div, unit.c_str(), dt_tot, peta);
                 printf("%s ", label.c_str());
                 if (use_colors) printf("\033[0m\033[32m\033[0m\015 ");
 
