@@ -18,7 +18,8 @@ class tqdm {
         std::chrono::time_point<std::chrono::system_clock> t_old = std::chrono::system_clock::now();
         std::vector<double> deq;
         std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▋", "▋", "▊", "▉", "▉"};
-        bool in_screen = (system("test $STY") == 0) || (system("test $TMUX") == 0);
+        bool in_screen = (system("test $STY") == 0);
+        bool in_tmux = (system("test $TMUX") == 0);
         bool is_tty = isatty(1);
         bool use_colors = true;
         bool color_transition = true;
@@ -55,6 +56,8 @@ class tqdm {
         tqdm() {
             if (in_screen) {
                 set_theme_basic();
+                color_transition = false;
+            } else if (in_tmux) {
                 color_transition = false;
             }
         }
@@ -96,7 +99,7 @@ class tqdm {
                 // double avgdt = std::accumulate(deq.begin(),deq.end(),0.)/deq.size();
 
                 // EMA
-                float alpha = 0.2;
+                float alpha = 0.1;
                 double accum = *(deq.begin());
                 for(auto it = deq.begin()+1; it != deq.end(); it++){
                     accum = alpha*(*it) + (1.0-alpha)*accum;
