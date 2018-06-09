@@ -86,8 +86,7 @@ class tqdm {
         }
 
         void progress( int curr, int tot) {
-            if (!is_tty) return;
-            if(curr%period == 0) {
+            if(is_tty && (curr%period == 0)) {
                 nupdates++;
                 auto now = std::chrono::system_clock::now();
                 double dt = ((std::chrono::duration<double>)(now - t_old)).count();
