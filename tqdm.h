@@ -20,9 +20,10 @@ class tqdm {
         int n_old = 0;
         std::vector<double> deq_t;
         std::vector<int> deq_n;
-        unsigned long nupdates = 0;
+        int nupdates = 0;
+        int total_ = 0;
         int period = 1;
-        int smoothing = 50;
+        unsigned int smoothing = 50;
         bool use_ema = true;
         float alpha_ema = 0.1;
 
@@ -76,6 +77,7 @@ class tqdm {
             deq_n.clear();
             period = 1;
             nupdates = 0;
+            total_ = 0;
             label = "";
         }
 
@@ -93,8 +95,14 @@ class tqdm {
             use_colors = false;
         }
 
+        void finish() {
+            progress(total_,total_);
+            printf("\n");
+            fflush(stdout);
+        }
         void progress( int curr, int tot) {
             if(is_tty && (curr%period == 0)) {
+                total_ = tot;
                 nupdates++;
                 auto now = std::chrono::system_clock::now();
                 double dt = ((std::chrono::duration<double>)(now - t_old)).count();
@@ -110,7 +118,7 @@ class tqdm {
                 double avgrate = 0.;
                 if (use_ema) {
                     avgrate = deq_n[0] / deq_t[0];
-                    for (auto i = 1; i < deq_t.size(); i++) {
+                    for (unsigned int i = 1; i < deq_t.size(); i++) {
                         double r = 1.0*deq_n[i]/deq_t[i];
                         avgrate = alpha_ema*r + (1.0-alpha_ema)*avgrate;
                     }
@@ -169,7 +177,6 @@ class tqdm {
                 if (use_colors) printf("\033[0m\033[32m\033[0m\015 ");
 
                 if( ( tot - curr ) > period ) fflush(stdout);
-                else std::cout << std::endl;
 
             }
         }

@@ -9,6 +9,7 @@ int main() {
     for(int i = 0; i < 100000000; i++) {
         bar.progress(i, 100000000);
     }
+    bar.finish();
 
     bar.reset();
     std::cout << "Smooth bar:" << std::endl;
@@ -16,6 +17,7 @@ int main() {
         bar.progress(i, N);
         usleep(1000);
     }
+    bar.finish();
 
     std::cout << "Basic:" << std::endl;
     bar.reset();
@@ -24,6 +26,7 @@ int main() {
         bar.progress(i, N);
         usleep(1000);
     }
+    bar.finish();
 
     std::cout << "Braille:" << std::endl;
     bar.reset();
@@ -32,6 +35,7 @@ int main() {
         bar.progress(i, N);
         usleep(3000);
     }
+    bar.finish();
 
     std::cout << "Line:" << std::endl;
     bar.reset();
@@ -40,6 +44,7 @@ int main() {
         bar.progress(i, N);
         usleep(3000);
     }
+    bar.finish();
 
     std::cout << "Circles:" << std::endl;
     bar.reset();
@@ -48,6 +53,7 @@ int main() {
         bar.progress(i, N);
         usleep(3000);
     }
+    bar.finish();
 
     return 0;
 }
