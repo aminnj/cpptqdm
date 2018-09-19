@@ -27,7 +27,8 @@ class tqdm {
         bool use_ema = true;
         float alpha_ema = 0.1;
 
-        std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▋", "▋", "▊", "▉", "▉"};
+        std::vector<const char*> bars = {" ", "▏", "▎", "▍", "▌", "▋", "▊", "▉", "█"};
+
         bool in_screen = (system("test $STY") == 0);
         bool in_tmux = (system("test $TMUX") == 0);
         bool is_tty = isatty(1);
