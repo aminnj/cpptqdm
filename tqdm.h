@@ -102,7 +102,7 @@ class tqdm {
             printf("\n");
             fflush(stdout);
         }
-        void progress( int curr, int tot) {
+        void progress(int curr, int tot) {
             if(is_tty && (curr%period == 0)) {
                 total_ = tot;
                 nupdates++;
