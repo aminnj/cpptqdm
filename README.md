@@ -11,6 +11,7 @@ for(int i = 0; i < N; i++) {
     bar.progress(i, N);
     // stuff
 }
+bar.finish();
 ```
 
 #### Looks like
