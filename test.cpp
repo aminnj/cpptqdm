@@ -1,5 +1,13 @@
 #include "tqdm.h"
 
+#if _MSC_VER
+#include <thread>
+void usleep(int usec)
+{
+    std::this_thread::sleep_for(std::chrono::microseconds(usec));
+}
+#endif
+
 int main() {
 
     int N = 2000;
